@@ -13,7 +13,7 @@ use crate::{
 };
 
 pub fn xpmv1_decryption(path: String, key: String) {
-    // In the XPManager v1.0 we dose not use buffer to read
+    // In the XPManager v1.0 we do not use buffer to read
     // from the file, So the encryption/decryption 
     // will be different.
     let logger = loglib::Logger::new("xpmv1-decryption");
@@ -52,11 +52,17 @@ pub fn decrypt(path: String, key: String) {
             if let Ok(mut de_file) = std::fs::File::create(
                 filelib::make_decrypt_path(path)
             ) {
+                // The encryption block size buffer
+                // Uses to read the size of the block
                 let mut size_buf = [0u8; 4];
                 loop {
+                    // Read the size of the block before reading the block
                     if en_file.read_exact(&mut size_buf).is_err() {
                         break;
                     }
+                    // Encryption file format: "<length><en-data><length><en-data>"
+                    // Read the block size and make a buffer with this size and then
+                    // read the encryption block using the buffer.
                     let size = u32::from_be_bytes(size_buf) as usize;
                     let mut encryption_buffer = vec![0u8; size];
                     en_file.read_exact(&mut encryption_buffer).unwrap();
@@ -65,6 +71,7 @@ pub fn decrypt(path: String, key: String) {
                             encryption_buffer
                         ).unwrap()
                     ).unwrap();
+                    // Save the decrypted blocks one by one.
                     de_file.write_all(&data).unwrap();
                 }
                 return;

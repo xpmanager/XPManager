@@ -13,15 +13,32 @@ use crate::{
     dblib
 };
 
+/// Encrypt file using **Fernet**.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::FileOpen`
+/// - `errorlib::ExitErrorCode::InvalidKey`
+/// 
+/// ### Example:
+/// ```
+/// let key = encrypt_file::encrypt("./dir/f.txt", "<your-key>");
+/// // or without key, it will generate new key
+/// let key = encrypt_file::encrypt("./dir/f.txt", "");
+/// ```
 pub fn encrypt(path: String, key: String) -> String {
     let logger = loglib::Logger::new("encrypt-file");
+
+    // Check the key or generate one
     let key = if key.len() < 1 {
         Fernet::generate_key()
     } else {
         key
     };
+
     if let Some(fernet) = Fernet::new(&key) {
+        // Open the source file
         if let Ok(mut de_file) = std::fs::File::open(&path) {
+            // Create and open the encrypted file
             if let Ok(mut en_file) = std::fs::File::create(
                 filelib::make_encrypt_path(path)
             ) {
@@ -32,8 +49,20 @@ pub fn encrypt(path: String, key: String) -> String {
                         break;
                     }
                     let encryption_data = fernet.encrypt(&buffer[..bytes_read] );
+                    // When we use the buffers to read and encrypted we do not know the
+                    // length of the data after the encryption, so we get the encryption
+                    // data length and store it in the ecryption file with the data. When
+                    // we decrypt the file we need to get the length of the data from the
+                    // start of the file. Store format: "<length><en-data><length><en-data>",
+                    // every block of data has been encrypted will have the length of it
+                    // in the stat of the block, We use the length as u32 so it will be a 
+                    // list with fixed 4 numbers as u8 (e.g. [0u8, 0u8, 0u8, 0u8]).
+                    // NOTE: Any change in the size type or the Fernet encryption function
+                    // or making the buffer size bigger will be `breaking change`.
                     let size = encryption_data.len() as u32;
+                    // save the block length before the encrypted block
                     en_file.write_all(&size.to_be_bytes()).unwrap();
+                    // save the encrypted block after saving the length of it
                     en_file.write_all(&encryption_data.as_bytes()).unwrap();
                 }
                 return key;
@@ -55,12 +84,16 @@ pub fn main(command: &ArgMatches) {
             errorlib::ExitErrorCode::FileNotFound
         );
     }
+
+    // Check the key
     let mut _key = "".to_owned();
     if is_key {
         _key = utilities::input("Enter your key: ");
         logger.start();
     }
     logger.info("encryption in progress....");
+
+    // Encrypt the file
     let key = encrypt(path.clone(), _key);
     if !is_key {
         displaylib::key::display(key);
@@ -72,6 +105,8 @@ pub fn main(command: &ArgMatches) {
         &format!("encrypt file at '{}'", path.clone()), 
         filelib::log::get_log_db_path()
     );
+
+    // Delete the origin file
     if *command.get_one::<bool>("delete").unwrap_or(&false) {
         logger.start();
         filelib::wipe_delete(path.clone());
