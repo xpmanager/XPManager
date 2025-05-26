@@ -7,6 +7,21 @@ use super::{
     FileState
 };
 
+/// Get the encrypted password manager database full path.
+/// It will return the database path in the user's 
+/// data directory: 
+/// - Linux: `/home/{user}/.local/share/XPManager/data/passwords.db.x`
+/// - MacOS: `/Users/{user}/Library/Application Support/XPManager/data/passwords.db.x`
+/// - Windows: `C:\Users\{user}\AppData\Roaming\XPManager\data\passwords.db.x`
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::SystemDataDirNotFound`
+/// 
+/// ### Example:
+/// ```
+/// let pm_db_path = filelib::pm::get_encrypted_db_path();
+/// println!("Path is: {}", pm_db_path);
+/// ```
 pub fn get_encrypted_db_path() -> PathBuf {
     let logger = loglib::Logger::new("get-pm-encrypted-db-path");
     if let Some(data_path) = data_dir() {
@@ -21,6 +36,21 @@ pub fn get_encrypted_db_path() -> PathBuf {
     }
 }
 
+/// Get the password manager database full path.
+/// It will return the database path in the user's 
+/// data directory: 
+/// - Linux: `/home/{user}/.local/share/XPManager/data/passwords.db`
+/// - MacOS: `/Users/{user}/Library/Application Support/XPManager/data/passwords.db`
+/// - Windows: `C:\Users\{user}\AppData\Roaming\XPManager\data\passwords.db`
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::SystemDataDirNotFound`
+/// 
+/// ### Example:
+/// ```
+/// let pm_db_path = filelib::pm::get_decrypted_db_path();
+/// println!("Path is: {}", pm_db_path);
+/// ```
 pub fn get_decrypted_db_path() -> PathBuf {
     let logger = loglib::Logger::new("get-pm-decrypted-db-path");
     if let Some(data_path) = data_dir() {
@@ -33,6 +63,23 @@ pub fn get_decrypted_db_path() -> PathBuf {
     }
 }
 
+/// Get the password manager database state. It will
+/// return `FileState` enum: 
+/// - Encrypted
+/// - Decrypted
+/// - NotFound
+/// 
+/// ### Example:
+/// ```
+/// let pm_db_state = filelib::pm::warning_encrypt_database();
+/// if pm_db_state == filelib::FileState::Encrypted {
+///     println!("password manager database is encrypted.");
+/// } else if pm_db_state == filelib::FileState::Decrypted {
+///     println!("password manager database is decrypted.");
+/// } else {
+///     println!("password manager database not found!");
+/// }
+/// ```
 pub fn db_state() -> FileState {
     if get_encrypted_db_path().exists() {
         return FileState::Encrypted;
@@ -42,6 +89,14 @@ pub fn db_state() -> FileState {
     return FileState::NotFound;
 }
 
+/// Check the password manager database
+/// if it is not encrypted.
+/// 
+/// ### Example:
+/// ```
+/// // it will print warning if the db is decrypted.
+/// filelib::pm::warning_encrypt_database();
+/// ```
 pub fn warning_encrypt_database() {
     let logger = loglib::Logger::new("check-password-manager-database");
     if db_state() == FileState::Decrypted {
