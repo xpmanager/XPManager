@@ -10,6 +10,19 @@ use super::{
     Width
 };
 
+/// Display logs in a table format.
+/// 
+/// ### Example:
+/// ```
+/// let logs = vec![
+///     dblib::log::LogInfoForamt {
+///         id: 32,
+///         log: "create pass123".to_string(),
+///         create_at: "2025-05-24 15:59:12".to_string()
+///     }
+/// ];
+/// displaylib::log::display(logs);
+/// ```
 pub fn display(logs: Vec<dblib::log::LogInfoForamt>) {
     let (width, _) = terminal::size().unwrap_or((80, 0));
     let max_col_width = (width as f32 * 0.7 ) as usize;
