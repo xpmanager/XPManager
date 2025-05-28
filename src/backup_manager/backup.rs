@@ -8,6 +8,17 @@ use crate::{
     dblib
 };
 
+/// Backup the password manager database.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::FileNotEncrypted`
+/// - `errorlib::ExitErrorCode::PMDatabaseNotFound`
+/// 
+/// ### Example:
+/// ```
+/// // find it at: `./to/passwords.db.x`
+/// password_manager("./to".to_string());
+/// ```
 fn password_manager(path: String) {
     let logger = loglib::Logger::new("password-manager-backup");
     let pm_db_state = filelib::pm::db_state();
@@ -42,6 +53,16 @@ fn password_manager(path: String) {
     logger.info("created the password manager backup successfully.");
 }
 
+/// Backup the log manager database.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::LMDatabaseNotFound`
+/// 
+/// ### Example:
+/// ```
+/// // find it at: `./to/xpm-log.db`
+/// logs_manager("./to".to_string());
+/// ```
 fn logs_manager(path: String) {
     let logger = loglib::Logger::new("logs-manager-backup");
     let log_db_path = filelib::log::get_log_db_path()
