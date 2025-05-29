@@ -68,6 +68,7 @@ pub fn main(command: &ArgMatches) {
     let mut logger = loglib::Logger::new("encrypt-dir");
     let path = command.get_one::<String>("PATH").unwrap();
     let is_delete = *command.get_one::<bool>("delete").unwrap_or(&false);
+    let no_threads = *command.get_one::<bool>("no-threads").unwrap_or(&false);
     let mut files_paths: Vec<PathBuf> = vec![];
     let key = if *command.get_one::<bool>("key")
         .unwrap_or(&false) {
@@ -102,18 +103,30 @@ pub fn main(command: &ArgMatches) {
     logger.start();
     let log_db_path = filelib::log::get_log_db_path();
 
-    // Distribute files over the number of threads 
-    let distributed_paths: Vec<Vec<PathBuf>> = utilities::distribute_paths(files_paths.clone());
-
-    // Run the threads
-    distributed_paths.par_iter().for_each(|paths| {
+    if no_threads {
+        logger.info("start the encryption using the main thread.");
         encrypt(
-            paths, 
+            &files_paths, 
             key.clone(), 
             is_delete, 
             log_db_path.clone()
         );
-    });
+    } else {
+        logger.info("start the encryption with the max number of threads.");
+        // Distribute files over the number of threads 
+        let distributed_paths: Vec<Vec<PathBuf>> = utilities::distribute_paths(files_paths.clone());
+
+        // Run the threads
+        distributed_paths.par_iter().for_each(|paths| {
+            encrypt(
+                paths, 
+                key.clone(), 
+                is_delete, 
+                log_db_path.clone()
+            );
+        });
+    }
+
     logger.info("directory encrypted successfully.");
     displaylib::key::display(key);
     dblib::log::register(

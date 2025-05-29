@@ -73,17 +73,19 @@ pub fn commands() -> Vec<Command> {
                     .alias("end")
                     .about("Encrypt directory.")
                     .args([
-                        arg!(<PATH>   "Directory path (e.g. \"/home/user/important\")."),
-                        arg!(--delete "Delete the origin files in the directory."),
-                        arg!(--key    "Use custom key.")
+                        arg!(<PATH>         "Directory path (e.g. \"/home/user/important\")."),
+                        arg!(--delete       "Delete the origin files in the directory."),
+                        arg!(--"no-threads" "Encrypt directory using the main thread only."),
+                        arg!(--key          "Use custom key.")
                     ]),
                 Command::new("decrypt-dir")
                     .alias("ded")
                     .about("Decrypt directory.")
                     .args([
-                        arg!(<PATH>   "Directory path (e.g. \"/home/user/important\")."),
-                        arg!(--delete "Delete the origin files in the directory."),
-                        arg!(--xpmv1  "Decrypt XPManager v1.0 directory.")
+                        arg!(<PATH>         "Directory path (e.g. \"/home/user/important\")."),
+                        arg!(--delete       "Delete the origin files in the directory."),
+                        arg!(--"no-threads" "Decrypt directory using the main thread only."),
+                        arg!(--xpmv1        "Decrypt XPManager v1.0 directory.")
                     ]),
                 Command::new("encode")
                     .alias("enc")

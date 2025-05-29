@@ -77,6 +77,7 @@ pub fn main(command: &ArgMatches) {
     let mut files_paths: Vec<PathBuf> = vec![];
     let is_xpmv1 = *command.get_one::<bool>("xpmv1").unwrap_or(&false);
     let is_delete = *command.get_one::<bool>("delete").unwrap_or(&false);
+    let no_threads = *command.get_one::<bool>("no-threads").unwrap_or(&false);
     let key = utilities::input("Enter your key: ");
     logger.start();
     filelib::dir_files_tree(
@@ -96,18 +97,30 @@ pub fn main(command: &ArgMatches) {
     }
     logger.info("directory listed successfully.");
     
-    // Distribute files over the number of threads 
-    let distributed_paths: Vec<Vec<PathBuf>> = utilities::distribute_paths(files_paths.clone());
-
-    // Run the threads
-    distributed_paths.par_iter().for_each(|paths| {
+    if no_threads {
+        logger.info("start the decryption using the main thread.");
         decrypt(
-            paths, 
+            &files_paths, 
             key.clone(), 
             is_delete, 
             is_xpmv1
         );
-    });
+    } else {
+        logger.info("start the decryption with the max number of threads.");
+        // Distribute files over the number of threads 
+        let distributed_paths: Vec<Vec<PathBuf>> = utilities::distribute_paths(files_paths.clone());
+    
+        // Run the threads
+        distributed_paths.par_iter().for_each(|paths| {
+            decrypt(
+                paths, 
+                key.clone(), 
+                is_delete, 
+                is_xpmv1
+            );
+        });
+    }
+
     logger.info("directory decrypted successfully.");
     displaylib::key::display(key);
 }
