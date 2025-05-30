@@ -1,16 +1,16 @@
 use super::Colorize;
 
-/// Despley the encoded string.
+/// Despley the decoded string.
 /// 
 /// ### Example:
 /// ```
-/// let encode = "1111000 1110000 1101101";
-/// displaylib::encode::display(encode);
+/// let decode = "XPManager";
+/// displaylib::decode::display(decode);
 /// ```
 pub fn display(new: String) {
     println!(
         "{}:\n{}\n",
-        "The encode".green(),
+        "The decode".green(),
         new.green()
     )
 }

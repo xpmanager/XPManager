@@ -105,7 +105,7 @@ pub fn main(command: &ArgMatches) {
     } else {
         _encoded_date = hex(string.clone());
     };
-    displaylib::encode::display(&_encoded_date);
+    displaylib::encode::display(_encoded_date);
     logger.info("string encoded successfully.");
 }
 
