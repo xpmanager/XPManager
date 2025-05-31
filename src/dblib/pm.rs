@@ -10,6 +10,7 @@ use super::{
     Tabled
 };
 
+/// The password DTO.
 #[derive(Tabled)]
 pub struct PasswordInfoForm {
     pub id: i32,
@@ -19,6 +20,17 @@ pub struct PasswordInfoForm {
     pub update_at: String,
 }
 
+/// Create the password table in the database.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBCreateTable`
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let pm_db_path = PathBuf::new().join("./dir/passwords.db");
+/// dblib::pm::create_passwords_table(pm_db_path);
+/// ```
 pub fn create_passwords_table(password_manager_db_path: PathBuf) {
     let logger = loglib::Logger::new("create-passwords-table");
     if let Ok(conn) = Connection::open(&password_manager_db_path) {
@@ -54,6 +66,17 @@ pub fn create_passwords_table(password_manager_db_path: PathBuf) {
     }
 }
 
+/// Save password.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBInsert`
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let pm_db_path = PathBuf::new().join("./dir/passwords.db");
+/// dblib::pm::save_password(pm_db_path, "XPManager".to_string(), "pass123".to_string());
+/// ```
 pub fn save_password(password_manager_db_path: PathBuf, name: String, password: String) {
     let logger = loglib::Logger::new("save-password");
     if let Ok(conn) = Connection::open(&password_manager_db_path) {
@@ -81,6 +104,19 @@ pub fn save_password(password_manager_db_path: PathBuf, name: String, password: 
     }
 }
 
+/// Find one password using string.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Exmaple: 
+/// ```
+/// let pm_db_path = PathBuf::new().join("./dir/passwords.db");
+/// let passwords: Vec<dblib::pm::PasswordInfoForm> = dblib::pm::find_password(pm_db_path, "XPManager".to_string());
+/// for pass in passwords {
+///     println!("{}: {}", pass.name, pass.password)
+/// }
+/// ```
 pub fn find_password(password_manager_db_path: PathBuf, string: String) -> Vec<PasswordInfoForm> {
     let logger = loglib::Logger::new("dblib");
     if let Ok(conn) = Connection::open(&password_manager_db_path) {
@@ -111,10 +147,38 @@ pub fn find_password(password_manager_db_path: PathBuf, string: String) -> Vec<P
     );
 }
 
+/// Get all passwords.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let pm_db_path = PathBuf::new().join("./dir/passwords.db");
+/// let passwords: Vec<dblib::pm::PasswordInfoForm> = dblib::pm::get_passwords(pm_db_path);
+/// for pass in passwords {
+///     println!("{}: {}", pass.name, pass.password)
+/// }
+/// ```
 pub fn get_passwords(password_manager_db_path: PathBuf) -> Vec<PasswordInfoForm> {
     find_password(password_manager_db_path, "".to_owned())
 }
 
+/// Update the password.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let pm_db_path = PathBuf::new().join("./dir/passwords.db");
+/// let rows_affected = dblib::pm::update_password(pm_db_path, "1".to_string(), "pass123".to_string());
+/// if rows_affected > 0 {
+///     println!("{} passwords updated.", rows_affected);
+/// } else {
+///     println!("No password found!");
+/// }
+/// ```
 pub fn update_password(password_manager_db_path: PathBuf, id: String, password: String) -> usize {
     let logger = loglib::Logger::new("update-password");
     if let Ok(conn) = Connection::open(&password_manager_db_path) {
@@ -138,6 +202,21 @@ pub fn update_password(password_manager_db_path: PathBuf, id: String, password: 
     }
 }
 
+/// Update the password name.
+/// 
+/// ### Exit: 
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let pm_db_path = PathBuf::new().join("./dir/passwords.db");
+/// let rows_affected = dblib::pm::update_password_name(pm_db_path, "1".to_string(), "XPManager".to_string());
+/// if rows_affected > 0 {
+///     println!("{} passwords updated.", rows_affected);
+/// } else {
+///     println!("No password found!");
+/// }
+/// ```
 pub fn update_password_name(password_manager_db_path: PathBuf, id: String, name: String) -> usize {
     let logger = loglib::Logger::new("update-password");
     if let Ok(conn) = Connection::open(&password_manager_db_path) {
@@ -161,6 +240,17 @@ pub fn update_password_name(password_manager_db_path: PathBuf, id: String, name:
     }
 }
 
+/// Get the number of passwords.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example: 
+/// ```
+/// let pm_db_path = PathBuf::new().join("./dir/passwords.db");
+/// let number_of_passwords = dblib::pm::get_passwords_number(pm_db_path);
+/// println!("number of password: {}", number_of_passwords);
+/// ```
 pub fn get_passwords_number(password_manager_db_path: PathBuf) -> usize {
     let logger = loglib::Logger::new("dblib");
     if let Ok(conn) = Connection::open(&password_manager_db_path) {
@@ -179,6 +269,21 @@ pub fn get_passwords_number(password_manager_db_path: PathBuf) -> usize {
     );
 }
 
+/// Delete password by id.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let pm_db_path = PathBuf::new().join("./dir/passwords.db");
+/// let rows_affected = dblib::pm::delete_password(pm_db_path, "1".to_string());
+/// if rows_affected > 0 {
+///     println!("{} passwords deleted.", rows_affected);
+/// } else {
+///     println!("No password found!");
+/// }
+/// ```
 pub fn delete_password(password_manager_db_path: PathBuf, id: String) -> usize {
     let logger = loglib::Logger::new("dblib");
     if let Ok(conn) = Connection::open(&password_manager_db_path) {

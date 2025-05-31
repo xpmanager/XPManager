@@ -6,6 +6,13 @@ use crate::{
     errorlib,
 };
 
+/// Decode XPManager v1.0 key style to string.
+/// 
+/// ### Example: 
+/// ```
+/// let xpm = decode::xpmv1("0x124f08%$%0x111690%$%0x10a163", 9999);
+/// assert_eq!(xpm, "xpm");
+/// ```
 pub fn xpmv1(string: String, n: u16) -> String {
     const XPM_KEY_MARK: &str = "%$%";
     string
@@ -20,6 +27,13 @@ pub fn xpmv1(string: String, n: u16) -> String {
         .collect::<String>()
 }
 
+/// Decode hexadecimal to string.
+/// 
+/// ### Example:
+/// ```
+/// let xpm = decode::hex("78 70 6D");
+/// assert_eq!(xpm, "xpm");
+/// ```
 pub fn hex(string: String) -> String {
     string
         .split(" ")
@@ -31,6 +45,13 @@ pub fn hex(string: String) -> String {
         .collect::<String>()
 }
 
+/// Decode binary string.
+/// 
+/// ### Example:
+/// ```
+/// let xpm = decode::bin("1111000 1110000 1101101");
+/// assert_eq!(xpm, "xpm");
+/// ```
 pub fn bin(string: String) -> String {
     string
         .split(" ")
@@ -69,7 +90,7 @@ pub fn main(command: &ArgMatches) {
     } else {
         _encoded_date = hex(string.clone());
     };
-    displaylib::encode::display(&_encoded_date);
+    displaylib::decode::display(_encoded_date);
     logger.info("string decoded successfully.");
 }
 

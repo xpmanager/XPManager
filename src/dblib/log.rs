@@ -9,6 +9,7 @@ use crate::{
     errorlib
 };
 
+/// The log DTO.
 #[derive(Tabled)]
 pub struct LogInfoForamt {
     pub id: u32,
@@ -16,6 +17,17 @@ pub struct LogInfoForamt {
     pub create_at: String
 }
 
+/// Create the log table in the database.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBCreateTable`
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let log_db_path = PathBuf::new().join("./dir/logs.db");
+/// dblib::log::create_log_table(log_db_path);
+/// ```
 fn create_log_table(log_db_path: PathBuf) {
     let logger = loglib::Logger::new("create-logs-table");
     if let Ok(conn) = Connection::open(&log_db_path) {
@@ -45,6 +57,18 @@ fn create_log_table(log_db_path: PathBuf) {
     }
 }
 
+/// Register log.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::LMDatabaseEncrypted`
+/// - `errorlib::ExitErrorCode::DBInsert`
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let log_db_path = PathBuf::new().join("./dir/logs.db");
+/// dblib::log::register("'XPManager' seved.".to_string(), log_db_path);
+/// ```
 pub fn register(log: &str, log_db_path: PathBuf) {
     let logger = loglib::Logger::new("register-log");
     let log_db_path_str = log_db_path.to_str().unwrap().to_string();
@@ -86,6 +110,21 @@ pub fn register(log: &str, log_db_path: PathBuf) {
     }
 }
 
+/// Delete all logs.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let log_db_path = PathBuf::new().join("./dir/logs.db");
+/// let rows_affected = dblib::log::delete_all(log_db_path);
+/// if rows_affected > 0 {
+///     println!("{} logs deleted.", rows_affected);
+/// } else {
+///     println!("No log found!");
+/// }
+/// ```
 pub fn delete_all(log_db_path: PathBuf) -> usize {
     let logger = loglib::Logger::new("delete-all-logs");
     if let Ok(conn) = Connection::open(&log_db_path) {
@@ -103,6 +142,28 @@ pub fn delete_all(log_db_path: PathBuf) -> usize {
     }
 }
 
+/// Get logs by a string. or get all logs.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let log_db_path = PathBuf::new().join("./dir/logs.db");
+/// let logs: Vec<dblib::log::LogInfoForamt> = dblib::log::get_logs(
+///     log_db_path, 
+///     0, // the number of logs to return, 0 means all logs
+///     "".to_string() // the search string, "" means all logs
+/// );
+/// for log in logs {
+///     println!(
+///         "{}: {} - {}", 
+///         log.id, 
+///         log.log, 
+///         log.create_at
+///     );
+/// }
+/// ```
 pub fn get_logs(log_db_path: PathBuf, length: u16, string: String) -> Vec<LogInfoForamt> {
     let logger = loglib::Logger::new("get-logs");
     if let Ok(conn) = Connection::open(&log_db_path) {
@@ -151,6 +212,27 @@ pub fn get_logs(log_db_path: PathBuf, length: u16, string: String) -> Vec<LogInf
     );
 }
 
+/// Get log by date. 
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example: 
+/// ```
+/// let log_db_path = PathBuf::new().join("./dir/logs.db");
+/// let logs: Vec<dblib::log::LogInfoForamt> = dblib::log::get_logs_by_date(
+///     log_db_path, 
+///     (2023, 12, 9) // format: (year, month, day)
+/// );
+/// for log in logs {
+///     println!(
+///         "{}: {} - {}", 
+///         log.id, 
+///         log.log, 
+///         log.create_at
+///     );
+/// }
+/// ```
 pub fn get_logs_by_date(log_db_path: PathBuf, date: (u16, u8, u8)) -> Vec<LogInfoForamt> {
     let logger = loglib::Logger::new("get-logs");
     if let Ok(conn) = Connection::open(&log_db_path) {
@@ -200,6 +282,21 @@ pub fn get_logs_by_date(log_db_path: PathBuf, date: (u16, u8, u8)) -> Vec<LogInf
     );
 }
 
+/// Delete log using id.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::DBConnection`
+/// 
+/// ### Example:
+/// ```
+/// let log_db_path = PathBuf::new().join("./dir/logs.db");
+/// let rows_affected = dblib::log::delete_one(log_db_path, "1".to_string());
+/// if rows_affected > 0 {
+///     println!("{} logs deleted.", rows_affected);
+/// } else {
+///     println!("No log found!");
+/// }
+/// ```
 pub fn delete_one(log_db_path: PathBuf, id: String) -> usize {
     let logger = loglib::Logger::new("delete-log");
     if let Ok(conn) = Connection::open(&log_db_path) {

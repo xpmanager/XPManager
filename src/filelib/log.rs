@@ -5,6 +5,16 @@ use super::{
     PathBuf
 };
 
+/// Get the log manager database path.
+/// 
+/// ### Exit:
+/// - `errorlib::ExitErrorCode::SystemDataDirNotFound`
+/// 
+/// ### Example: 
+/// ```
+/// let log_db_path = filelib::log::get_log_db_path();
+/// prinln!("Log manager database path: {}", log_db_path.display());
+/// ```
 pub fn get_log_db_path() -> PathBuf {
     let logger = loglib::Logger::new("get-log-db-pth");
     if let Some(path) = data_dir() {

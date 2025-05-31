@@ -15,6 +15,19 @@ use crate::{
     displaylib
 };
 
+/// Generate password from a sample.
+/// 
+/// ### Example:
+/// ```
+/// let password = generate(
+///     128, // the length
+///     utilities::get_sample( // the sample
+///         utilities::PasswordSample::Hex // the sample type
+///     )
+/// );
+/// assert_eq!(password.len(), 128);
+/// println!("Your password: {}", password);
+/// ```
 fn generate(length: u16, sample: &mut Vec<char> ) -> String {
     let mut rng = rand::rng();
     sample.shuffle(&mut rng);

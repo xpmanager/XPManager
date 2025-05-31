@@ -1,6 +1,6 @@
 [package]
 name = "XPManager"
-version = "2.2.0"
+version = "2.3.0"
 edition = "2021"
 description = "A fast and efficient CLI tool for managing passwords and encrypting sensitive data."
 authors = ["Mohaned Sherhan"]
@@ -27,7 +27,9 @@ colored = "3.0.0"
 crossterm = "0.28.1"
 dirs = "6.0.0"
 fernet = "0.2.2"
+num_cpus = "1.16.0"
 rand = "0.9.0"
+rayon = "1.10.0"
 rusqlite = { version = "0.34.0", features = ["bundled"] }
 serde = "1.0.219"
 serde_json = "1.0.140"

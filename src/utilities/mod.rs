@@ -5,13 +5,33 @@ use crate::{
 };
 use colored::Colorize;
 use rand::seq::{IndexedRandom, IteratorRandom};
+use std::path::PathBuf;
 
+/// The password sample types.
+/// uses to chooes sample to generate the password.
 #[derive(PartialEq)]
 pub enum PasswordSample {
     Ascii,
     NoSymbols,
     Hex
 }
+
+/// Generate sample based on the type.
+/// types from PasswordSample enum:
+/// - Ascii: A-Z, a-z, 0-9 and some symbols.
+/// - NoSymbols: A-Z, a-z and 0-9.
+/// - Hex: 0-9 and A-F.
+/// 
+/// ### Example:
+/// ```
+/// let sample = utilities::get_sample(
+///     utilities::PasswordSample::Hex
+/// );
+/// let hex: Vec<char> = ('0'..='9')
+///     .chain('A'..='F')
+///     .collect();
+/// assert_eq!(sample, hex);
+/// ```
 pub fn get_sample(sample: PasswordSample) -> Vec<char> {
     match sample {
         PasswordSample::Ascii => return ('a'..='z')
@@ -32,6 +52,14 @@ pub fn get_sample(sample: PasswordSample) -> Vec<char> {
     }
 }
 
+/// Generate random number as `String` between 32 to 73.
+/// 
+/// ## Example:
+/// ```
+/// let number_str = utilities::get_ran_string_number();
+/// let number = number_str.parse::<i32>().unwrap_or(0);
+/// assert_eq!(number >= 32 && number <= 72, true);
+/// ```
 pub fn get_ran_string_number() -> String {
     let mut rag = rand::rng();
     // Choose random length between 32 to 72.
@@ -41,6 +69,17 @@ pub fn get_ran_string_number() -> String {
         .to_string();
 }
 
+/// Read a string from standard input.
+/// 
+/// ### Example
+/// ```
+/// let input = utilities::input("Enter your name: ");
+/// if input == "Mohaned" {
+///     println!("Hello Mohaned");
+/// } else {
+///     println!("hi {}", input);
+/// }
+/// ```
 pub fn input(message: &str) -> String {
     use std::io::Write;
     print!("{}", message);
@@ -52,6 +91,19 @@ pub fn input(message: &str) -> String {
     return line.trim().to_owned();
 }
 
+/// Get user confirmation by entring 6-digit code.
+/// Exit the program if the confirmation fails.
+/// 
+/// ### Example:
+/// ```
+/// let mut logger = loglib::Logger::new("delete-file");
+/// logger.warning("file will be deleted!");
+/// 
+/// utilities::confirm(); // Waiting for the user...
+/// logger.start(); // Reset the counter, confirmation will take a while.
+/// 
+/// delete_file(PathBuf::new().join("./file.txt"));
+/// ```
 pub fn confirm() {
     let mut logger = loglib::Logger::new("confirm");
     logger.warning("This process requires confirmation!");
@@ -76,6 +128,51 @@ pub fn confirm() {
         )
     }
     logger.info("confirmation completed successfully.");
+}
+
+/// Distribute paths to `Vec<Vec<PathBuf>>` based on the threads number,
+/// every `Vec<PathBuf>` carries all paths for one thread, the length
+/// of `Vec<Vec<PathBuf>>` is the number of threads.
+/// 
+/// ### Example:
+/// ```
+/// let files_paths = vec!["file-1.txt", "file-2.txt", "file-3.txt", "file-4.txt"];
+/// let let distributed_paths = utilities::distribute_paths(files_paths.clone());
+/// // if the number of theards >= 4
+/// assert_eq!(
+///     distributed_paths, 
+///     vec![
+///         vec!["file-1.txt"],
+///         vec!["file-2.txt"],
+///         vec!["file-3.txt"],
+///         vec!["file-4.txt"],
+///     ]
+/// );
+/// ```
+pub fn distribute_paths(files_paths: Vec<PathBuf>) -> Vec<Vec<PathBuf>> {
+    let mut paths: Vec<Vec<PathBuf>> = Vec::new();
+    let thread_num = num_cpus::get().max(1);
+    if files_paths.len() <= thread_num {
+        for i in files_paths.clone() {
+            paths.push(vec![i]);
+        }
+    } else {
+        let items_num_per_thread = (files_paths.len() as f64/thread_num as f64).ceil() as usize;
+        let mut seek = 0;
+        for i in 1..=thread_num {
+            if items_num_per_thread*i > files_paths.len() {
+                paths.push(
+                    (files_paths[seek..files_paths.len()]).to_vec()
+                );
+                break;
+            }
+            paths.push(
+                (files_paths[seek..items_num_per_thread*i]).to_vec()
+            );
+            seek = items_num_per_thread * i;
+        }
+    }
+    return paths;
 }
 
 

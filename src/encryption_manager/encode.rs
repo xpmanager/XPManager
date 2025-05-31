@@ -6,6 +6,13 @@ use crate::{
     errorlib,
 };
 
+/// Encode string to XPManager v1.0 key style.
+/// 
+/// ### Example:
+/// ```
+/// let xpm_xpmv1 = encode::xpmv1("xpm", 9999);
+/// assert_eq!(xpm_xpmv1, "0x124f08%$%0x111690%$%0x10a163");
+/// ```
 pub fn xpmv1(string: String, n: u16) -> String {
     const XPM_KEY_MARK: &str = "%$%";
     string
@@ -15,6 +22,13 @@ pub fn xpmv1(string: String, n: u16) -> String {
         .join(XPM_KEY_MARK)
 }
 
+/// Encode string to hexadecimal.
+/// 
+/// ### Example:
+/// ```
+/// let xpm_hex = encode::hex("xpm");
+/// assert_eq!(xpm_hex, "78 70 6D");
+/// ```
 pub fn hex(string: String) -> String {
     string
         .chars()
@@ -23,6 +37,13 @@ pub fn hex(string: String) -> String {
         .join(" ")
 }
 
+/// Hash string as hexadecimal using simple operation.
+/// 
+/// ### Example:
+/// ```
+/// let xpm_hash = encode::hex_hash("xpm is the best!");
+/// assert_eq!(xpm_hash, "155 DC 141 1CF");
+/// ```
 pub fn hex_hash(string: String) -> String {
     let mut hash = String::new();
     let mut num : u32 = 0;
@@ -40,6 +61,13 @@ pub fn hex_hash(string: String) -> String {
     hash.trim().to_owned()
 }
 
+/// Encode string to binary.
+/// 
+/// ### Example:
+/// ```
+/// let xpm_bin = encode::bin("xpm");
+/// assert_eq!(xpm_bin, "1111000 1110000 1101101");
+/// ```
 pub fn bin(string: String) -> String {
     string
         .chars()
@@ -77,7 +105,7 @@ pub fn main(command: &ArgMatches) {
     } else {
         _encoded_date = hex(string.clone());
     };
-    displaylib::encode::display(&_encoded_date);
+    displaylib::encode::display(_encoded_date);
     logger.info("string encoded successfully.");
 }
 

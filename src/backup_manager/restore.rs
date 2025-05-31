@@ -14,6 +14,23 @@ use crate::{
     utilities
 };
 
+/// Save the passwords `HashMap` to the password manager database.
+/// 
+/// ### Example:
+/// ```
+/// let passwords_map = vec_to_hash_map(
+///     vec![
+///         dblib::pm::PasswordInfoForm {
+///             id: 32,
+///             name: "XPManager".to_string(),
+///             password: "pass123".to_string(),
+///             create_at: "2025-05-24 15:59:12".to_string(),
+///             update_at: "2025-05-24 15:59:12".to_string()
+///         }
+///     ]
+/// );
+/// hash_map_to_pm_db(passwords_map, PathBuf::new().join("./dir/passwords.db"));
+/// ```
 fn hash_map_to_pm_db(data: HashMap<String, String>, pm_db_path: PathBuf) {
     let logger = loglib::Logger::new("password-restore");
     for (name, password) in data {
@@ -33,6 +50,25 @@ fn hash_map_to_pm_db(data: HashMap<String, String>, pm_db_path: PathBuf) {
     }
 }
 
+/// Parse `dblib::pm::PasswordInfoForm` list to `HashMap`.
+/// 
+/// ### Example:
+/// ```
+/// let map = vec_to_hash_map(
+///     vec![
+///         dblib::pm::PasswordInfoForm {
+///             id: 32,
+///             name: "XPManager".to_string(),
+///             password: "pass123".to_string(),
+///             create_at: "2025-05-24 15:59:12".to_string(),
+///             update_at: "2025-05-24 15:59:12".to_string()
+///         }
+///     ]
+/// );
+/// for (name, password) in map {
+///     println!("{}: {}", name, password);
+/// }
+/// ```
 fn vec_to_hash_map(data: Vec<dblib::pm::PasswordInfoForm>) -> HashMap<String, String> {
     let mut passwords: HashMap<String, String> = HashMap::new();
     for pass in data {
@@ -44,6 +80,12 @@ fn vec_to_hash_map(data: Vec<dblib::pm::PasswordInfoForm>) -> HashMap<String, St
     return passwords;
 }
 
+/// Restore log manager database.
+/// 
+/// ### Example:
+/// ```
+/// logs_manager("./dir/logs.db".to_string());
+/// ```
 fn logs_manager(path: String) {
     let logger = loglib::Logger::new("logs-restore");
     let logs_manager_db_path = filelib::log::get_log_db_path()

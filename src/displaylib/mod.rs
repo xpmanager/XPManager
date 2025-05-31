@@ -1,6 +1,7 @@
 pub mod passwords;
 pub mod key;
 pub mod encode;
+pub mod decode;
 pub mod log;
 
 use colored::Colorize;

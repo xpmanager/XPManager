@@ -13,6 +13,13 @@ use super::{
     ByColumnName
 };
 
+/// Display one password.
+/// 
+/// ### Example:
+/// ```
+/// let password = "pass123".to_string();
+/// displaylib::passwords::display_one(password);
+/// ```
 pub fn display_one(password: String) {
     println!(
         "\n{} {}\n",
@@ -21,6 +28,21 @@ pub fn display_one(password: String) {
     )
 }
 
+/// Display passwords as a list.
+/// 
+/// ### Example:
+/// ```
+/// let passwords = vec![
+///     dblib::pm::PasswordInfoForm {
+///         id: 32,
+///         name: "XPManager".to_string(),
+///         password: "pass123".to_string(),
+///         create_at: "2025-05-24 15:59:12".to_string(),
+///         update_at: "2025-05-24 15:59:12".to_string()
+///     }
+/// ];
+/// displaylib::passwords::display_many(passwords, "XPM".to_string());
+/// ```
 pub fn display_many(passwords: Vec<dblib::pm::PasswordInfoForm>, string: String) {
     println!();
     for pass in passwords {
@@ -48,6 +70,21 @@ pub fn display_many(passwords: Vec<dblib::pm::PasswordInfoForm>, string: String)
     println!();
 }
 
+/// Display passwords in a table format.
+/// 
+/// ### Example:
+/// ```
+/// let passwords = vec![
+///     dblib::pm::PasswordInfoForm {
+///         id: 32,
+///         name: "XPManager".to_string(),
+///         password: "pass123".to_string(),
+///         create_at: "2025-05-24 15:59:12".to_string(),
+///         update_at: "2025-05-24 15:59:12".to_string()
+///     }
+/// ];
+/// displaylib::passwords::display_as_table(passwords);
+/// ```
 pub fn display_as_table(passwords: Vec<dblib::pm::PasswordInfoForm>) {
     let (width, _) = terminal::size().unwrap_or((80, 0));
     let max_col_width = (width as f32 * 0.7 ) as usize;
