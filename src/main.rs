@@ -16,7 +16,7 @@ mod errorlib;
 fn main() {
     let matches = Command::new("xpm")
         .about("Password manager, File/Folder encryptor, Strings encoder.")
-        .version("2.2.0")
+        .version("2.3.0")
         .author("Mohaned Sherhan")
         .subcommands(commands::commands())
         .get_matches();

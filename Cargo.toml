@@ -1,6 +1,6 @@
 [package]
 name = "XPManager"
-version = "2.2.0"
+version = "2.3.0"
 edition = "2021"
 description = "A fast and efficient CLI tool for managing passwords and encrypting sensitive data."
 authors = ["Mohaned Sherhan"]
